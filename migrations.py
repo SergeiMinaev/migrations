@@ -12,7 +12,7 @@ TAG = '# '
 
 
 def exec_cmd(cmd):
-    return subprocess.run(shlex.split(cmd), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    r = subprocess.run(shlex.split(cmd), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     if r.stderr != b'':
         print(r.stderr)
         sys.exit()
@@ -65,7 +65,7 @@ def enumerate_migrations():
     lines = f.readlines()
     f.close()
     new = ''
-    n = 0
+    n = 1
     for line in lines:
         if line.startswith(TAG):
             n = int(line.strip(TAG)) + 1
@@ -97,7 +97,7 @@ def apply():
     for line in lines:
         if line.startswith(TAG):
             n = int(line.strip(TAG))
-            if n > last_n:
+            if last_n is None or n > last_n:
                 is_any_unapplied_found = True
                 q = ''.join(lines).split(f'\n{TAG}{n}')[1].split(TAG)[0].strip()
                 print(f'\n>>> This query will be executed:\n{q}')
