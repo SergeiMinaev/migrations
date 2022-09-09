@@ -13,8 +13,9 @@ TAG = '# '
 
 def exec_cmd(cmd):
     r = subprocess.run(shlex.split(cmd), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    if r.stderr != b'':
-        print(r.stderr)
+    if r.stderr != b'' and not r.stderr.startswith(b'NOTICE:'):
+        print('QUERY:', cmd)
+        print('ERROR:', r.stderr)
         sys.exit()
     return r
 
@@ -103,7 +104,7 @@ def apply():
                 print(f'\n>>> This query will be executed:\n{q}')
                 if input('\n>>> Apply? ').lower() == 'y':
                     q = q.replace('\n', ' ')
-                    cmd = f"{BASE_CMD} '{q}'"
+                    cmd = f'{BASE_CMD} "{q}"'
                     exec_cmd(cmd)
                     update_last_applied(n)
                     print('>>> Applied successfully.\n')
